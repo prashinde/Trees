@@ -1,6 +1,54 @@
 #include "AVLTree.h"
+static bool _search(struct node *r, int key)
+{
+	if(r == NULL)
+		return false;
+	if(r->val == key)
+		return true;
+	if(r->val < key)
+		return _search(r->right, key);
+	return _search(r->left, key);
+}
 
-static void update_hts(struct node *r) {
+static int get_ht(struct node *r)
+{
+	if(r == NULL)
+		return 0;
+	return 1+max(get_ht(r->left), get_ht(r->right));
+}
+
+static void start_test(struct node *r) 
+{
+	if(r == NULL)
+		return;
+	start_test(r->left);
+	int lht = get_ht(r->left);
+	int rht = get_ht(r->right);
+
+	//cout << "LHT:" << lht << " " << "RHT: " << rht << endl;
+	assert(abs(lht-rht) <= 1);
+	assert(lht == r->lht);
+	assert(rht == r->rht);
+	start_test(r->right);
+}
+
+static void test_srt_in(struct node *r, int &inp, bool &val)
+{
+	if(r == NULL)
+		return;
+	test_srt_in(r->left, inp, val);
+	if(!val) {
+		inp = r->val;
+		val = true;
+	} else {
+		assert(r->val > inp);
+		inp = r->val;
+	}
+	test_srt_in(r->right, inp, val);
+}
+
+static void update_hts(struct node *r)
+{
 	if(r->left == NULL) {
 		r->lht = 0;
 	} else {
@@ -14,7 +62,8 @@ static void update_hts(struct node *r) {
 	}
 }
 
-static struct node *LL(struct node *cr) {
+static struct node *LL(struct node *cr)
+{
 	struct node *child;
 
 	child = cr->left;
@@ -25,7 +74,8 @@ static struct node *LL(struct node *cr) {
 	return child;
 }
 
-static struct node *LR(struct node *cr) {
+static struct node *LR(struct node *cr)
+{
 	struct node *child = cr->left;
 	struct node *rnode = child->right;
 	
@@ -39,7 +89,8 @@ static struct node *LR(struct node *cr) {
 	return LL(cr);
 }
 
-static struct node *RR(struct node *cr) {
+static struct node *RR(struct node *cr)
+{
 	struct node *child = cr->right;
 
 	cr->right = child->left;
@@ -49,7 +100,8 @@ static struct node *RR(struct node *cr) {
 	return child;
 }
 
-static struct node *RL(struct node *cr) {
+static struct node *RL(struct node *cr)
+{
 	struct node *child = cr->right;
 	struct node *lnode = child->left;
 
@@ -179,6 +231,21 @@ avltree :: ~avltree()
 	this->destroy();
 }
 
+void avltree :: test_tree_prop()
+{
+	/**
+	 * Inorder traversal must be sorted;
+	 */
+	int inp = -1;
+	bool val = false;	
+	test_srt_in(this->root, inp, val);
+	/* 
+	 * Calculate the height of each node.
+	 * and verify if it satisfies AVL properties
+	 */
+	start_test(this->root);
+}
+
 int avltree :: LCA(int f, int s)
 {
 	return _LCA(this->root, f, s);
@@ -194,4 +261,9 @@ int avltree :: remove(int key)
 {
 	this->root = _remove(this->root, key);
 	return 0;
+}
+
+bool avltree :: search(int key)
+{
+	return _search(this->root, key);
 }

@@ -1,11 +1,13 @@
 #ifndef __BTREE_H_
 #define __BTREE_H_
+#include <assert.h>
 
 #include <iostream>
 #include <queue>
 #include <stack>
 #include <stdlib.h>
 using namespace std;
+
 struct node {
 	int val;
 	int lht;
@@ -31,6 +33,7 @@ public:
 	void inorder_it();
 	void postorder_it();
 	void preorder_it();
+	void test_tree_prop();
 private:
 	queue<struct node *> Q;
 protected:

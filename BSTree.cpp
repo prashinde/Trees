@@ -1,5 +1,16 @@
 #include "BSTree.h"
 
+static bool _search(struct node *r, int key)
+{
+	if(r == NULL)
+		return false;
+	if(r->val == key)
+		return true;
+	if(r->val < key)
+		return _search(r->right, key);
+	return _search(r->left, key);
+}
+
 static struct node * _remove(struct node *r, int key)
 {
 	struct node *t;
@@ -97,4 +108,8 @@ int bstree :: remove(int key)
 {
 	this->root = _remove(this->root, key);
 	return 0;
+}
+bool bstree :: search(int key)
+{
+	return _search(this->root, key);
 }
